@@ -91,6 +91,9 @@ static States_t State = RX;
 static uint8_t BufferRx[MAX_APP_BUFFER_SIZE];
 /* App Tx Buffer*/
 extern uint8_t BufferTx[MAX_APP_BUFFER_SIZE];
+extern float temp;
+extern float humid;
+extern int ID;         // Example ID value
 /* Last  Received Buffer Size*/
 uint16_t RxBufferSize = 0;
 /* Last  Received packer Rssi*/
@@ -237,10 +240,10 @@ void SubghzApp_Init(void)
 
   APP_LOG(TS_ON, VLEVEL_L, "rand=%d\n\r", random_delay);
   /*starts reception*/
-  Radio.Rx(RX_TIMEOUT_VALUE + random_delay);
+  //Radio.Rx(RX_TIMEOUT_VALUE + random_delay);
 
   /*register task to to be run in while(1) after Radio IT*/
-  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), UTIL_SEQ_RFU, PingPong_Process);
+  //UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), UTIL_SEQ_RFU, PingPong_Process);
   /* USER CODE END SubghzApp_Init_2 */
 }
 
@@ -297,7 +300,7 @@ static void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t LoraS
   }
   APP_LOG(TS_OFF, VLEVEL_H, "\n\r");
   /* Run PingPong process in background*/
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+  //UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
   /* USER CODE END OnRxDone */
 }
 
@@ -308,7 +311,7 @@ static void OnTxTimeout(void)
   /* Update the State of the FSM*/
   State = TX_TIMEOUT;
   /* Run PingPong process in background*/
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+  //UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
   /* USER CODE END OnTxTimeout */
 }
 
@@ -319,7 +322,7 @@ static void OnRxTimeout(void)
   /* Update the State of the FSM*/
   State = RX_TIMEOUT;
   /* Run PingPong process in background*/
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+  //UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
   /* USER CODE END OnRxTimeout */
 }
 
@@ -330,7 +333,7 @@ static void OnRxError(void)
   /* Update the State of the FSM*/
   State = RX_ERROR;
   /* Run PingPong process in background*/
-  UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
+  //UTIL_SEQ_SetTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Process), CFG_SEQ_Prio_0);
   /* USER CODE END OnRxError */
 }
 
@@ -361,8 +364,7 @@ static void PingPong_Process(void)
                     "PING"
                     "\n\r");
             APP_LOG(TS_ON, VLEVEL_L, "Master Tx start\n\r");
-           // memcpy(BufferTx, PING, sizeof(PING) - 1);
-					
+            memcpy(BufferTx, PING, sizeof(PING) - 1);
             Radio.Send(BufferTx, PAYLOAD_LEN);
           }
           else if (strncmp((const char *)BufferRx, PING, sizeof(PING) - 1) == 0)
@@ -424,6 +426,9 @@ static void PingPong_Process(void)
         /* Add delay between RX and TX*/
         /* add random_delay to force sync between boards after some trials*/
         HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
+				 APP_LOG(TS_ON, VLEVEL_L, "..."
+                    "temp?"
+                    "\n\r");
         APP_LOG(TS_ON, VLEVEL_L, "Master Tx start\n\r");
         /* master sends PING*/
         memcpy(BufferTx, PING, sizeof(PING) - 1);
@@ -431,12 +436,15 @@ static void PingPong_Process(void)
       }
       else
       {
+				APP_LOG(TS_ON, VLEVEL_L, "..."
+                    "hum?"
+                    "\n\r");
         APP_LOG(TS_ON, VLEVEL_L, "Slave Rx start\n\r");
         Radio.Rx(RX_TIMEOUT_VALUE);
       }
       break;
     case TX_TIMEOUT:
-      APP_LOG(TS_ON, VLEVEL_L, "Slave Rx start\n\r");
+
       Radio.Rx(RX_TIMEOUT_VALUE);
       break;
     default:
@@ -449,6 +457,15 @@ static void OnledEvent(void *context)
   HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin); /* LED_GREEN */
   HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin); /* LED_RED */
   UTIL_TIMER_Start(&timerLed);
+}
+
+void sendframe(void)
+{
+	memcpy(BufferTx, &temp, sizeof(temp));
+						memcpy(BufferTx + sizeof(temp), &humid, sizeof(humid));
+						memcpy(BufferTx + sizeof(temp) + sizeof(humid), &ID, sizeof(ID));
+	Radio.Send(BufferTx, PAYLOAD_LEN);
+	
 }
 
 /* USER CODE END PrFD */

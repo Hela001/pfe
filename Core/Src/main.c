@@ -22,6 +22,7 @@
 #include "app_subghz_phy.h"
 #include "gpio.h"
 #include "string.h"
+#include "subghz_phy_app.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -33,6 +34,7 @@
 /* USER CODE BEGIN PTD */
 float temp = 0;
 float humid = 0;
+int ID = 123;         // Example ID value
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -49,7 +51,7 @@ float humid = 0;
 /* USER CODE BEGIN PV */
  //int temperature = 25; // Example temperature value
   //  int humidity = 50;    // Example humidity value
-    int ID = 123;         // Example ID value
+
 	 uint8_t BufferTx[255];
 /* USER CODE END PV */
 
@@ -105,10 +107,10 @@ HTS221_GetTemperature(&temp);
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_SubGHz_Phy_Process();
-						memcpy(BufferTx, &temp, sizeof(temp));
-						memcpy(BufferTx + sizeof(temp), &humid, sizeof(humid));
-						memcpy(BufferTx + sizeof(temp) + sizeof(humid), &ID, sizeof(ID));
+		sendframe();
+		HAL_Delay(1000);
+    //MX_SubGHz_Phy_Process();
+						
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
