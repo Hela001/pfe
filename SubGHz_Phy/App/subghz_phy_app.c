@@ -90,7 +90,7 @@ static States_t State = RX;
 /* App Rx Buffer*/
 static uint8_t BufferRx[MAX_APP_BUFFER_SIZE];
 /* App Tx Buffer*/
-static uint8_t BufferTx[MAX_APP_BUFFER_SIZE];
+extern uint8_t BufferTx[MAX_APP_BUFFER_SIZE];
 /* Last  Received Buffer Size*/
 uint16_t RxBufferSize = 0;
 /* Last  Received packer Rssi*/
@@ -361,7 +361,8 @@ static void PingPong_Process(void)
                     "PING"
                     "\n\r");
             APP_LOG(TS_ON, VLEVEL_L, "Master Tx start\n\r");
-            memcpy(BufferTx, PING, sizeof(PING) - 1);
+           // memcpy(BufferTx, PING, sizeof(PING) - 1);
+					
             Radio.Send(BufferTx, PAYLOAD_LEN);
           }
           else if (strncmp((const char *)BufferRx, PING, sizeof(PING) - 1) == 0)

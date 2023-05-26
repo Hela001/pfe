@@ -21,6 +21,7 @@
 #include "i2c.h"
 #include "app_subghz_phy.h"
 #include "gpio.h"
+#include "string.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,7 +47,10 @@ float humid = 0;
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+ //int temperature = 25; // Example temperature value
+  //  int humidity = 50;    // Example humidity value
+    int ID = 123;         // Example ID value
+	 uint8_t BufferTx[255];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -102,7 +106,9 @@ HTS221_GetTemperature(&temp);
   {
     /* USER CODE END WHILE */
     MX_SubGHz_Phy_Process();
-
+						memcpy(BufferTx, &temp, sizeof(temp));
+						memcpy(BufferTx + sizeof(temp), &humid, sizeof(humid));
+						memcpy(BufferTx + sizeof(temp) + sizeof(humid), &ID, sizeof(ID));
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

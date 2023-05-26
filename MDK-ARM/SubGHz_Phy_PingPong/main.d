@@ -44,6 +44,7 @@ subghz_phy_pingpong/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\..\..\..\..\..\Drivers\STM32WLxx_HAL_Driver\Inc\stm32wlxx_ll_system.h \
   ..\Core\Inc\i2c.h ..\Core\Inc\main.h \
   ..\SubGHz_Phy\App\app_subghz_phy.h ..\Core\Inc\gpio.h \
-  ..\Core\Inc\hts221.h ..\Core\Inc\driver_i2c.h \
+  C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h ..\Core\Inc\hts221.h \
+  ..\Core\Inc\driver_i2c.h \
   C:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h \
   ..\Core\Inc\driver_i2c.h
